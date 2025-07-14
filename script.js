@@ -1,57 +1,127 @@
-const API_URL = "https://www.superheroapi.com/api.php/9b7a0dbdb3cce6a2f2fd7f5e93a4a51e/310";
-const heroCard = document.getElementById("heroCard");
+const ACCESS_TOKEN = "9b7a0dbdb3cce6a2f2fd7f5e93a4a51e";
+const API_BASE = `https://superheroapi.com/api.php/${ACCESS_TOKEN}`;
 
-fetch(API_URL)
-  .then(response => response.json())
-  .then(hero => {
-    heroCard.innerHTML = `
-      <img src="${hero.image.url}" alt="Harry Potter" />
-      <h2>${hero.name}</h2>
-      <section>
-        <h3>Power Stats</h3>
-        <p>🧠 Intelligence: ${hero.powerstats.intelligence}</p>
-        <p>💪 Strength: ${hero.powerstats.strength}</p>
-        <p>⚡ Speed: ${hero.powerstats.speed}</p>
-        <p>🛡️ Durability: ${hero.powerstats.durability}</p>
-        <p>✨ Power: ${hero.powerstats.power}</p>
-        <p>🥋 Combat: ${hero.powerstats.combat}</p>
-      </section>
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const heroInfoDiv = document.getElementById('hero-info');
+const favsListDiv = document.getElementById('favourites-list');
+const clearFavsBtn = document.getElementById('clear-favs');
 
-      <section>
-        <h3>Biography</h3>
-        <p><strong>Full Name:</strong> ${hero.biography["full-name"]}</p>
-        <p><strong>Alter Egos:</strong> ${hero.biography["alter-egos"]}</p>
-        <p><strong>Aliases:</strong> ${hero.biography.aliases.join(", ")}</p>
-        <p><strong>Place of Birth:</strong> ${hero.biography["place-of-birth"]}</p>
-        <p><strong>First Appearance:</strong> ${hero.biography["first-appearance"]}</p>
-        <p><strong>Publisher:</strong> ${hero.biography.publisher}</p>
-        <p><strong>Alignment:</strong> ${hero.biography.alignment}</p>
-      </section>
+// Load favourites from localStorage
+let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
 
-      <section>
-        <h3>Appearance</h3>
-        <p><strong>Gender:</strong> ${hero.appearance.gender}</p>
-        <p><strong>Race:</strong> ${hero.appearance.race}</p>
-        <p><strong>Height:</strong> ${hero.appearance.height.join(" / ")}</p>
-        <p><strong>Weight:</strong> ${hero.appearance.weight.join(" / ")}</p>
-        <p><strong>Eye Color:</strong> ${hero.appearance["eye-color"]}</p>
-        <p><strong>Hair Color:</strong> ${hero.appearance["hair-color"]}</p>
-      </section>
-
-      <section>
-        <h3>Work</h3>
-        <p><strong>Occupation:</strong> ${hero.work.occupation}</p>
-        <p><strong>Base:</strong> ${hero.work.base}</p>
-      </section>
-
-      <section>
-        <h3>Connections</h3>
-        <p><strong>Group Affiliation:</strong> ${hero.connections["group-affiliation"]}</p>
-        <p><strong>Relatives:</strong> ${hero.connections.relatives}</p>
-      </section>
-    `;
-  })
-  .catch(error => {
-    heroCard.innerHTML = `<p>Error loading Harry Potter's profile 😢</p>`;
-    console.error("API Error:", error);
+// Display favourites
+function renderFavourites() {
+  favsListDiv.innerHTML = '';
+  if (favourites.length === 0) {
+    favsListDiv.textContent = 'No favourites yet.';
+    return;
+  }
+  favourites.forEach(fav => {
+    const div = document.createElement('div');
+    div.className = 'fav-item';
+    div.textContent = fav.name;
+    div.onclick = () => fetchHeroById(fav.id);
+    favsListDiv.appendChild(div);
   });
+}
+
+// Save favourites to localStorage
+function saveFavourites() {
+  localStorage.setItem('favourites', JSON.stringify(favourites));
+}
+
+// Add hero to favourites
+function addToFavourites(hero) {
+  if (!favourites.find(fav => fav.id === hero.id)) {
+    favourites.push({ id: hero.id, name: hero.name });
+    saveFavourites();
+    renderFavourites();
+  }
+}
+
+// Remove all favourites
+clearFavsBtn.addEventListener('click', () => {
+  if (confirm('Are you sure you want to clear all favourites?')) {
+    favourites = [];
+    saveFavourites();
+    renderFavourites();
+  }
+});
+
+// Search hero by name to get ID using /search endpoint
+async function searchHeroByName(name) {
+  try {
+    const res = await fetch(`${API_BASE}/search/${encodeURIComponent(name)}`);
+    const data = await res.json();
+    if (data.response === 'success') {
+      // Return the first match for simplicity
+      return data.results[0];
+    } else {
+      throw new Error(data.error || 'Hero not found');
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Fetch hero by ID and display details
+async function fetchHeroById(id) {
+  heroInfoDiv.innerHTML = '<p>Loading...</p>';
+  try {
+    const res = await fetch(`${API_BASE}/${id}`);
+    const hero = await res.json();
+    if (hero.response === 'success') {
+      displayHero(hero);
+    } else {
+      heroInfoDiv.innerHTML = `<p class="error">Error: ${hero.error || 'Hero data not found'}</p>`;
+    }
+  } catch (error) {
+    heroInfoDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+  }
+}
+
+// Display hero details in the page
+function displayHero(hero) {
+  heroInfoDiv.innerHTML = `
+    <h2>${hero.name}</h2>
+    <img src="${hero.image.url}" alt="${hero.name}" />
+    <p><strong>Full Name:</strong> ${hero.biography['full-name'] || 'N/A'}</p>
+    <p><strong>Aliases:</strong> ${hero.biography.aliases.join(', ')}</p>
+    <p><strong>Publisher:</strong> ${hero.biography.publisher || 'N/A'}</p>
+    <p><strong>First Appearance:</strong> ${hero.biography['first-appearance'] || 'N/A'}</p>
+    <p><strong>Alignment:</strong> ${hero.biography.alignment || 'N/A'}</p>
+    <h3>Powerstats</h3>
+    <ul>
+      <li>Intelligence: ${hero.powerstats.intelligence}</li>
+      <li>Strength: ${hero.powerstats.strength}</li>
+      <li>Speed: ${hero.powerstats.speed}</li>
+      <li>Durability: ${hero.powerstats.durability}</li>
+      <li>Power: ${hero.powerstats.power}</li>
+      <li>Combat: ${hero.powerstats.combat}</li>
+    </ul>
+    <button id="fav-btn">Add to Favourites</button>
+  `;
+  document.getElementById('fav-btn').onclick = () => addToFavourites(hero);
+}
+
+// Handle search button click
+searchBtn.addEventListener('click', async () => {
+  const name = searchInput.value.trim();
+  if (!name) {
+    alert('Please enter a superhero name.');
+    return;
+  }
+  heroInfoDiv.innerHTML = '<p>Searching...</p>';
+  try {
+    const hero = await searchHeroByName(name);
+    if (hero) {
+      displayHero(hero);
+    }
+  } catch (error) {
+    heroInfoDiv.innerHTML = `<p class="error">${error.message}</p>`;
+  }
+});
+
+// On load render favourites list
+renderFavourites();

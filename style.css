@@ -1,43 +1,74 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-}
-
-.container {
+  font-family: Arial, sans-serif;
   max-width: 700px;
-  background: white;
-  padding: 20px;
-  margin: auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-img {
-  max-width: 150px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-h2 {
-  margin-top: 0;
+  margin: 20px auto;
+  padding: 10px;
+  background: #f0f2f5;
   color: #333;
 }
-
-p {
-  margin: 5px 0;
-  line-height: 1.4;
+h1 {
+  text-align: center;
 }
-
-section {
+#search-section {
+  display: flex;
+  gap: 10px;
   margin-bottom: 20px;
-  text-align: left;
 }
-
-h3 {
-  color: #555;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 4px;
+#search-input {
+  flex-grow: 1;
+  padding: 8px;
+  font-size: 1rem;
+}
+button {
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+#hero-info {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+img {
+  max-width: 150px;
+  border-radius: 8px;
+  float: right;
+  margin-left: 15px;
+}
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+#favourites-list {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.fav-item {
+  cursor: pointer;
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+}
+.fav-item:last-child {
+  border-bottom: none;
+}
+.fav-item:hover {
+  color: #0077ff;
+}
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.clear-btn {
+  background: #ff4c4c;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
 }

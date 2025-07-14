@@ -2,15 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Harry Potter - Superhero Profile</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Superhero Info One-Pager</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>🧙‍♂️ Harry Potter - Hero Profile</h1>
-    <div id="heroCard"></div>
-  </div>
+  <h1>All You Need to Know About Your Favourite Superhero</h1>
+
+  <section id="search-section">
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Enter superhero name, e.g. Batman"
+      autocomplete="off"
+    />
+    <button id="search-btn">Search</button>
+  </section>
+
+  <div id="hero-info"></div>
+
+  <h2>Favourites</h2>
+  <div id="favourites-list"></div>
+  <button class="clear-btn" id="clear-favs">Clear Favourites</button>
+
   <script src="script.js"></script>
 </body>
 </html>
